@@ -1,14 +1,12 @@
-# .
+# 2D GAME - QUEST WORLD
 
-This template should help get you started developing with Vue 3 in Vite.
+Objective: Create a 2D game animation which helps young adults in developing interest into the technology industry.
+Key features of game:
+-	Gamification
+-	Scoreboard to engage with users and give a sense of competitiveness
+-	Learning materials in form of reading or videos, keep user aware on the importance of software development and help them in getting a head start in the tech world.
 
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
+Framework: Vue JS, Tailwind CSS, Phaser JS
 
 ## Project Setup
 
