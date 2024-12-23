@@ -1,7 +1,11 @@
 <script setup>
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
 const play = () => {
-    console.log("Play is clicked")
-}
+    router.push("/levels");
+};
 const settings = () => {
     console.log("settings is clicked")
 }
