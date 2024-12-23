@@ -1,11 +1,9 @@
 <script setup>
+import MainMenu from "@/components/MainMenu.vue"
 </script>
 
 <template>
-  <header>
-  </header>
-
-  <main>
-    Hello World
-  </main>
+  <div id="app">
+    <MainMenu />
+  </div>
 </template>
