@@ -1,6 +1,5 @@
 <script setup>
 import { useRouter } from "vue-router";
-
 const router = useRouter();
 
 const play = () => {
@@ -12,7 +11,6 @@ const settings = () => {
 const learnMore = () => {
     console.log("learnMore is clicked")
 }
-
 </script>
 
 <template>
