@@ -5,7 +5,7 @@ const router = useRouter()
 const back = () => router.push("/")
 const startLevel = (level) => {
     console.log("Proceed Level:", level.name)
-    router.push(`/levels/${level.name.toLowerCase().replace(/\s+/g, "-")}`)
+    router.push(`/levels/${level.path}`)
 }
 
 const levels = [
@@ -13,16 +13,19 @@ const levels = [
         name: "Level 1: Python Variables",
         description: "We will be introducing what variable is in python and how to use them",
         image: "@/assets/levels/level1",
+        path: "level-1"
     },
     {
         name: "Level 2: Python If-Statements",
         description: "We will be introducing what variable is in python and how to use them",
         image: "@/assets/levels/level2",
+        path: "level-2"
     },
     {
         name: "Level 3: Python While-Loop",
         description: "We will be introducing what variable is in python and how to use them",
         image: "@/assets/levels/level3",
+        path: "level-3"
     },
 ]
 </script>
