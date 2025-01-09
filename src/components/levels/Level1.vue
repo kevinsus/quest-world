@@ -37,7 +37,6 @@ export default {
       }
     }
 
-    // Phaser Game Configuration
     const config = {
       type: Phaser.AUTO,
       width: window.innerWidth,
@@ -49,11 +48,10 @@ export default {
           gravity: { y: 200 },
         },
       },
-      parent: 'game-container', // Attach Phaser canvas to this div
+      parent: 'game-container',
     };
 
-    // Initialize the Phaser Game
-    const game = new Phaser.Game(config);
+    this.game = new Phaser.Game(config);
   },
 };
 </script>
