@@ -8,7 +8,7 @@ import Phaser from 'phaser';
 export default {
   name: 'Level2',
   mounted() 
-  {
+{
     const config = {
         type: Phaser.AUTO,
         parent: 'phaser-container',
