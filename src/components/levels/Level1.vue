@@ -3,6 +3,7 @@
         <div id="phaser-example">
             <button @click="back" class="bg-white">Back</button>
         </div>
+        <div id="editor"></div>
     </div>
 </template>  
 
@@ -20,11 +21,22 @@ canvas {
     display: block;
     margin: auto;
 }
+#editor {
+  border: 1px solid #ccc;
+  height: 100%;
+  width: 100%;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 14px;
+  background-color: aliceblue;
+}
 </style>
 
 <script>
 import { useRouter } from "vue-router"
 import Phaser from 'phaser';
+import { EditorView, basicSetup } from "codemirror"
+import { python } from "@codemirror/lang-python"
+
 
 export default {
     name: 'Level1',
@@ -48,7 +60,7 @@ export default {
                 default: 'arcade',
                 arcade: {
                     gravity: { y: 800 },
-                    debug: false,
+                    debug: true,
                 },
             },
             scene: {
@@ -62,6 +74,9 @@ export default {
         
         let player
         let platforms
+        let trap_platform
+        let ladder_platform
+        let pass_platform
 
         function preload() {
             this.load.atlas('knight', '/assets/knight.png', '/assets/knight.json');
@@ -70,14 +85,32 @@ export default {
         }
 
         function create() {
-            // Background        
-            this.add.image(500, 48, 'bg').setOrigin(0.5, 0).setScale(1.5);
-            platforms = this.physics.add.staticGroup()   // add static groups for platforms
-            for (let i = 0; i < 13; i++) platforms.create(64 * i, 670, 'tiles')
-
-            // Animation
-            player = this.physics.add.sprite(100, 450, 'knight').setOrigin(0.5, 1).setScale(3)
-
+            
+        // Background        
+        this.add.image(500, 48, 'bg').setOrigin(0.5, 0).setScale(1.5);
+        platforms = this.physics.add.staticGroup()   // add static groups for platforms
+        trap_platform = this.physics.add.staticGroup()
+        ladder_platform = this.physics.add.staticGroup()
+        pass_platform = this.physics.add.staticGroup()
+        for (let i = 4; i < 7; i++) trap_platform.create(64 * i, 670, 'tiles', 35) // spike traps
+        for (let i = 8; i < 10; i++) trap_platform.create(64 * i, 670, 'tiles', 35) // spike traps
+        for (let i = 4; i < 7; i++) platforms.create(64 * i, 350, 'tiles', 28) // box ground
+        for (let i = 8; i < 12; i++) platforms.create(64 * i, 510, 'tiles', 28) // box ground
+        for (let i = 9; i < 11; i++) platforms.create(64 * i, 255, 'tiles', 28) // box ground
+        for (let i = 0; i < 5; i++) ladder_platform.create(64 * 3, 350 + i * 64, 'tiles', 56) // ladder
+        for (let i = 0; i < 5; i++) ladder_platform.create(64 * 3, 350 + i * 64, 'tiles', 56) // ladder
+        for (let i = 0; i < 5; i++) ladder_platform.create(64 * 11, 255 + i * 64, 'tiles', 56) // ladder
+        for (let i = 0; i < 3; i++) ladder_platform.create(64 * 7, 510 + i * 64, 'tiles', 56) // ladder
+        for (let i = 0; i < 8; i++) pass_platform.create(64 * 13, 0 + i * 64, 'tiles', 27) // Wall
+        for (let i = 0; i < 4; i++) platforms.create(64 * i, 670, 'tiles') // ground
+        for (let i = 7; i < 8; i++) platforms.create(64 * i, 670, 'tiles') // ground
+        for (let i = 10; i < 17; i++) platforms.create(64 * i, 670, 'tiles') // ground
+        for (let i = 7; i < 8; i++) pass_platform.create(64 * i, 610, 'tiles', 42) // coins
+        for (let i = 9; i < 10; i++) pass_platform.create(64 * i, 190, 'tiles', 42) // coins
+        for (let i = 15; i < 16; i++) pass_platform.create(64 * i, 610, 'tiles', 57) // chest
+        
+        // Animation
+            player = this.physics.add.sprite(100, 450, 'knight').setScale(3).setSize(1);
             this.anims.create({ 
                 key: 'idle',
                 frames: this.anims.generateFrameNames("knight", { prefix: "idle/frame", start: 0, end: 5, zeroPad: 4 }),
@@ -98,9 +131,15 @@ export default {
             })
             this.anims.create({
                 key: 'fall',
-                frames: this.anims.generateFrameNames('knight', { prefix: "run/frame", start: 0, end: 0, zeroPad: 4 }),
+                frames: this.anims.generateFrameNames('knight', { prefix: "run/frame", start: 0, end: 1, zeroPad: 4 }),
                 frameRate: 8,
                 repeat: -1,
+            })
+            this.anims.create({
+                key: 'die',
+                frames: this.anims.generateFrameNames('knight', { prefix: "die/frame", start: 0, end: 9, zeroPad: 4 }),
+                frameRate: 12,
+                repeat: 0,
             })
 
             // Player setup
@@ -114,32 +153,77 @@ export default {
 
         }
         function update() {
-            // run and idle animation
-            if (player.anims.getName() !== 'jump') {
-                if (this.cursors.left.isDown) {
-                    player.setFlipX(true)
-                    player.setVelocityX(-160);
-                    player.play('run', true)
-                } else if (this.cursors.right.isDown) {
-                    player.setFlipX(false)
-                    player.setVelocityX(160)
-                    player.play('run', true)
-                } else {
-                    player.setVelocityX(0);
-                    player.play('idle', true)
-                }
-            }
 
-            // Jumping animation
-            if (this.cursors.up.isDown && player.body.touching.down) {
-                player.setVelocityY(-330);
-                player.play('jump', true)
-            }
-            // Fall animation
-            if (!player.body.touching.down && player.body.velocity.y > 0) {
-                player.play('fall', true);
+            if (player.anims.getName() !== 'die') {
+
+                // run and idle animation
+                if (player.anims.getName() !== 'jump') {
+                    if (this.cursors.left.isDown) {
+                        player.setFlipX(true)
+                        player.setVelocityX(-160);
+                        player.play('run', true)
+                        // console.log("run")
+                    } else if (this.cursors.right.isDown) {
+                        player.setFlipX(false)
+                        player.setVelocityX(160)
+                        player.play('run', true)
+                        // console.log("run")
+                    } else {
+                        player.setVelocityX(0);
+                        player.play('idle', true)
+                        // console.log("idle")
+                    }
+                }
+                
+                // Jumping animation
+                if (this.cursors.up.isDown && player.body.touching.down) {
+                    player.setVelocityY(-330);
+                    player.play('jump', true)
+                    // console.log("jump")
+                }
+                // Fall animation
+                if (!player.body.touching.down && player.body.velocity.y > 0) {
+                    player.play('fall', true);
+                    // console.log("fall_lol")
+                }
+                
+                // Die animation
+                if (this.physics.overlap(player, trap_platform)) {
+                    player.play('die', true)
+                    // console.log("die")
+                    this.time.delayedCall(500, () => {
+                        player.setVelocity(0)
+                    });
+                    this.time.delayedCall(3000, () => {
+                        this.scene.restart();
+                    });
+                }
+                
+                // Up Ladder Animation
+                if (this.physics.overlap(player, ladder_platform)) {
+                    if (this.cursors.up.isDown) {
+                        player.setVelocityY(-330);
+                        player.play('jump', true)
+                    }
+                    // console.log("jump_ladder")
+                } 
             }
         }
+
+
+        // CODE MIRROR
+        let view = new EditorView({
+            extensions: [
+                basicSetup, 
+                python(),
+                EditorView.updateListener.of((update) => {
+                    if (update.docChanged) { 
+                        // console.log(view.state.doc.toString())
+                    }
+                })
+            ],
+            parent: document.getElementById('editor')
+        })
     },
 };
 </script>
