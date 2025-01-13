@@ -77,6 +77,7 @@ export default {
         let trap_platform
         let ladder_platform
         let pass_platform
+        let player_stats = 'right'
 
         function preload() {
             this.load.atlas('knight', '/assets/knight.png', '/assets/knight.json');
@@ -99,9 +100,9 @@ export default {
         for (let i = 9; i < 11; i++) platforms.create(64 * i, 255, 'tiles', 28) // box ground
         for (let i = 0; i < 5; i++) ladder_platform.create(64 * 3, 350 + i * 64, 'tiles', 56) // ladder
         for (let i = 0; i < 5; i++) ladder_platform.create(64 * 3, 350 + i * 64, 'tiles', 56) // ladder
-        for (let i = 0; i < 5; i++) ladder_platform.create(64 * 11, 255 + i * 64, 'tiles', 56) // ladder
+        for (let i = 0; i < 4; i++) ladder_platform.create(64 * 11, 255 + i * 64, 'tiles', 56) // ladder
         for (let i = 0; i < 3; i++) ladder_platform.create(64 * 7, 510 + i * 64, 'tiles', 56) // ladder
-        for (let i = 0; i < 8; i++) pass_platform.create(64 * 13, 0 + i * 64, 'tiles', 27) // Wall
+        for (let i = 0; i < 7; i++) platforms.create(64 * 13, 0 + i * 64, 'tiles', 27) // Wall
         for (let i = 0; i < 4; i++) platforms.create(64 * i, 670, 'tiles') // ground
         for (let i = 7; i < 8; i++) platforms.create(64 * i, 670, 'tiles') // ground
         for (let i = 10; i < 17; i++) platforms.create(64 * i, 670, 'tiles') // ground
@@ -110,7 +111,10 @@ export default {
         for (let i = 15; i < 16; i++) pass_platform.create(64 * i, 610, 'tiles', 57) // chest
         
         // Animation
-            player = this.physics.add.sprite(100, 450, 'knight').setScale(3).setSize(1);
+            player = this.physics.add.sprite(100, 450, 'knight').setScale(3);
+            player.body.setSize(player.width * 0.2, player.height * 0.8)
+            player.body.setOffset(player.width * 0.3, player.height * 0.2)
+
             this.anims.create({ 
                 key: 'idle',
                 frames: this.anims.generateFrameNames("knight", { prefix: "idle/frame", start: 0, end: 5, zeroPad: 4 }),
@@ -153,18 +157,27 @@ export default {
 
         }
         function update() {
-
             if (player.anims.getName() !== 'die') {
 
                 // run and idle animation
                 if (player.anims.getName() !== 'jump') {
                     if (this.cursors.left.isDown) {
+                        if (player_stats === 'right') {
+                            player.setPosition(player.x - 50, player.y)
+                            player_stats = 'left'
+                        }
+                        player.body.setOffset(player.width * 0.5, player.height * 0.2)
                         player.setFlipX(true)
                         player.setVelocityX(-160);
                         player.play('run', true)
                         // console.log("run")
                     } else if (this.cursors.right.isDown) {
-                        player.setFlipX(false)
+                        if (player_stats === 'left') {
+                            player.setPosition(player.x + 50, player.y)
+                            player_stats = 'right'
+                        }
+                        player.body.setOffset(player.width * 0.3, player.height * 0.2)
+                        player.setFlipX(false) 
                         player.setVelocityX(160)
                         player.play('run', true)
                         // console.log("run")
