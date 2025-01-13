@@ -99,7 +99,6 @@ export default {
         for (let i = 8; i < 12; i++) platforms.create(64 * i, 510, 'tiles', 28) // box ground
         for (let i = 9; i < 11; i++) platforms.create(64 * i, 255, 'tiles', 28) // box ground
         for (let i = 0; i < 5; i++) ladder_platform.create(64 * 3, 350 + i * 64, 'tiles', 56) // ladder
-        for (let i = 0; i < 5; i++) ladder_platform.create(64 * 3, 350 + i * 64, 'tiles', 56) // ladder
         for (let i = 0; i < 4; i++) ladder_platform.create(64 * 11, 255 + i * 64, 'tiles', 56) // ladder
         for (let i = 0; i < 3; i++) ladder_platform.create(64 * 7, 510 + i * 64, 'tiles', 56) // ladder
         for (let i = 0; i < 7; i++) platforms.create(64 * 13, 0 + i * 64, 'tiles', 27) // Wall
@@ -108,12 +107,12 @@ export default {
         for (let i = 10; i < 17; i++) platforms.create(64 * i, 670, 'tiles') // ground
         for (let i = 7; i < 8; i++) pass_platform.create(64 * i, 610, 'tiles', 42) // coins
         for (let i = 9; i < 10; i++) pass_platform.create(64 * i, 190, 'tiles', 42) // coins
-        for (let i = 15; i < 16; i++) pass_platform.create(64 * i, 610, 'tiles', 57) // chest
+        for (let i = 15; i < 16; i++) platforms.create(64 * i, 610, 'tiles', 57) // chest
         
         // Animation
             player = this.physics.add.sprite(100, 450, 'knight').setScale(3);
-            player.body.setSize(player.width * 0.2, player.height * 0.8)
-            player.body.setOffset(player.width * 0.3, player.height * 0.2)
+            player.body.setSize(player.width * 0.27, player.height * 0.8)
+            player.body.setOffset(player.width * 0.24, player.height * 0.2)
 
             this.anims.create({ 
                 key: 'idle',
@@ -145,6 +144,20 @@ export default {
                 frameRate: 12,
                 repeat: 0,
             })
+            this.anims.create({
+                key: 'attack',
+                frames: this.anims.generateFrameNames('knight', { prefix: 'attack_C/frame', start: 0, end: 13, zeroPad: 4} ),
+                frameRate: 16,
+                repeat: -1,
+            })
+
+            // Coins Animations
+            this.anims.create({
+                key: 'attack',
+                frames: this.anims.generateFrameNames( 'coins', { start: 42, end: 47 }),
+                frameRate: 12,
+                repeat: -1
+            })
 
             // Player setup
             this.physics.add.collider(player, platforms)
@@ -163,7 +176,7 @@ export default {
                 if (player.anims.getName() !== 'jump') {
                     if (this.cursors.left.isDown) {
                         if (player_stats === 'right') {
-                            player.setPosition(player.x - 50, player.y)
+                            player.setPosition(player.x - 55, player.y)
                             player_stats = 'left'
                         }
                         player.body.setOffset(player.width * 0.5, player.height * 0.2)
@@ -173,10 +186,10 @@ export default {
                         // console.log("run")
                     } else if (this.cursors.right.isDown) {
                         if (player_stats === 'left') {
-                            player.setPosition(player.x + 50, player.y)
+                            player.setPosition(player.x + 55, player.y)
                             player_stats = 'right'
                         }
-                        player.body.setOffset(player.width * 0.3, player.height * 0.2)
+                        player.body.setOffset(player.width * 0.24, player.height * 0.2)
                         player.setFlipX(false) 
                         player.setVelocityX(160)
                         player.play('run', true)
@@ -199,7 +212,7 @@ export default {
                     player.play('fall', true);
                     // console.log("fall_lol")
                 }
-                
+
                 // Die animation
                 if (this.physics.overlap(player, trap_platform)) {
                     player.play('die', true)
@@ -217,8 +230,15 @@ export default {
                     if (this.cursors.up.isDown) {
                         player.setVelocityY(-330);
                         player.play('jump', true)
+                        player.body.setAllowGravity(true)
+                    } else if (this.cursors.down.isDown) {
+                        player.setVelocityY(330)
+                        player.play('fall', true)
+                        player.body.setAllowGravity(true)
+                    } else {
+                        player.setVelocityY(0)
+                        player.body.setAllowGravity(false)
                     }
-                    // console.log("jump_ladder")
                 } 
             }
         }
