@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import Phaser, { NONE } from 'phaser'
+import Phaser from 'phaser'
 import { useRouter } from 'vue-router'
 import { EditorView, basicSetup } from 'codemirror';
 import { python } from '@codemirror/lang-python';
@@ -30,6 +30,8 @@ export default {
         const back = () => {
             router.push('/levels')
         }
+
+        // console.log("hero.moveRight(5)")
 
         // Setup Phaser
         const config = {
@@ -60,8 +62,9 @@ export default {
         let ladder_platforms
         let player_stats = 'idle'
 
-        let curr_posX
-        let curr_posY
+        let curr_posX = 0
+        let curr_posY = 0
+        let numMove = 0
 
         function preload() {
             this.load.atlas('knight', '/assets/knight.png', '/assets/knight.json')
@@ -135,24 +138,111 @@ export default {
             // PLAYER SETUP
             player = this.physics.add.sprite(93, 450, 'knight')
             player.setScale(3)
-            player.setSize(player.width * 0.27, player.height * 0.8)
-            player.setOffset(player.width * 0.24, player.height * 0.2)
+            player.setSize(player.width * 0.25, player.height * 0.8)
+            player.setOffset(player.width * 0.25, player.height * 0.2)
 
             this.physics.add.collider(player, platforms)
             player.setBounce(0.2)
             player.setCollideWorldBounds(true)
+            
+            player_stats = 'idle'
         }
         function update() {
-            player.play(player_stats, true)
+            if (player_stats === 'attack') player.play('attack', true)
+            if (player_stats != 'die') {
+                if (player_stats === 'idle'
+                    || player_stats === 'idle_right'
+                    || player_stats === 'idle_left'
+                    // || player_stats === 'idle_jump_ladder'
+                    || player_stats === 'idle_jump'
+                ) player.play('idle', true)
+                
+                // Moving Animations
+                if (numMove > 0) {
+                    if (player_stats === 'idle_right') player_stats = 'run_right'
+                    if (player_stats === 'idle_left') player_stats = 'run_left'
+                    if (player_stats === 'idle_jump') player_stats = 'jump'
 
-            if (player_stats === 'run') {
-                if (!curr_posX) curr_posX = player.x
-                player.setVelocityX(160)
-                if ((player.x - curr_posX) > 59) {
-                    player.setVelocityX(0)
-                    player_stats = 'idle'
-                    curr_posX = null
+                    // RUN RIGHT Animation
+                    if (player_stats === 'run_right') {
+                        player.body.setAllowGravity(true)
+
+                        if (curr_posX === 0) curr_posX = player.x
+                
+                        if ((player.x - curr_posX) <= 60) {
+                            player.play('run', true)
+                            player.setFlipX(false)
+                            player.setVelocityX(160)
+                        }
+                        else {
+                            player.setVelocityX(0)
+                            curr_posX = 0
+                            player_stats = 'idle_right'
+                            numMove -= 1
+                        }
+                    }
+                    
+                    // RUN LEFT Animation
+                    if (player_stats === 'run_left') {
+                        player.body.setAllowGravity(true)
+
+                        console.log(curr_posX, player.x)
+                        if (curr_posX === 0) curr_posX = player.x
+                        
+                        if ((curr_posX - player.x) <= 60) {
+                            player.play('run', true)
+                            player.setFlipX(true)
+                            player.setVelocityX(-160)
+                        }
+                        else {
+                            player.setVelocityX(0)
+                            curr_posX = 0
+                            player_stats = 'idle_left'
+                            numMove -= 1
+                        }
+                    }
+
+                    // Jump Animations
+                    if (player_stats === 'jump') {
+                        if (this.physics.overlap(player, ladder_platforms)) {
+                            player.body.setAllowGravity(false)
+
+                            // LADDER JUMP Animation
+                            console.log(curr_posY, player.y)
+                            if (curr_posY === 0) curr_posY = player.y
+                    
+                            if ((curr_posY - player.y) <= 50) {
+                                player.play('jump', true)
+                                player.setVelocityY(-330)
+                            }
+                            else {
+                                player.setVelocityY(0)
+                                curr_posY = 0
+                                player_stats = 'idle_jump'
+                                numMove -= 1
+                            }
+                        } else {
+                            // NORMAL JUMP Animation
+                            player.body.setAllowGravity(true)
+
+                            if (player.body.touching.down) {
+                                player.setVelocityY(-330)
+                                player.play('jump', true)
+                                player_stats = 'idle_jump'
+                                numMove -= 1
+                            }
+                        }
+                    }
                 }
+            }
+
+            // DIE Animation
+            if (this.physics.overlap(player, trap_platforms) && player.anims.getName() !== 'die') {
+                player_stats = 'die'
+                player.play('die', true)
+                this.time.delayedCall(3000, () => {
+                    this.scene.restart();
+                });
             }
         }
 
@@ -172,18 +262,34 @@ export default {
         })
 
         function runCode() {
-            if (view.state.doc.text.includes('hero.attack()')) {
-                player_stats = 'attack'
+            for (const command of view.state.doc.text) {
+                if (command) {
+                    if (/^hero.attack\(\)$/.test(command)) {
+                        player_stats = 'attack'
+                    } else if (command.match(/.*\((\d+)\)$/)) {
+                        const match = command.match(/.*\((\d+)\)$/) // regex for capture the number of repetition
+                        numMove = parseInt(match[1], 10)
+                        
+                        if (/^hero.moveRight\(\d+\)$/.test(command)) {
+                            player_stats = 'run_right'
+                        }
+                        else if (/^hero.moveUp\(\d+\)$/.test(command)) {
+                            player_stats = 'jump'
+                        }
+                        else if (/^hero.moveLeft\(\d+\)$/.test(command)) {
+                            player_stats = 'run_left'
+                        }
+                        else {
+                            player_stats = 'idle'
+                            console.log('no match string')
+                        }
+                    } else {
+                        console.log('no match string')
+                    }
+
+                }
             }
-            if (view.state.doc.text.includes('hero.moveRight()')) {
-                player_stats = 'run'
-            }
-            if (view.state.doc.text.includes('hero.moveUp()')) {
-                player_stats = 'jump'
-            }
-            if (view.state.doc.text.includes('hero.moveLeft')) {
-                player_stats = 'run'
-            }
+
         }
 
         return { back, runCode }
