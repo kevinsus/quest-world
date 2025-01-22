@@ -15,6 +15,23 @@
 </template>
 
 <script>
+/*
+ * TODO:
+ * - MULTIPLE COMMAND SUPPORT
+ * - COIN ANIMATION and EARN COINS
+ * - CHEST ATTACK ANIMATION
+ * - GOING DOWN LADDER
+ * - MOBILE SUPPORT <?>
+ * - POP UP FOR: GOING NEXT LEVEL, PUTTING WRONG COMMAND
+ * - HINTS AND TASKS
+ * - SCOREBOARD and TUTORIAL VIDEO (after completing each level)
+ * - MAIN MENU UI / UX
+ * 
+ * BUGS: 
+ * - PLAYER KEEP JUMPING WHEN CLIMBING LADDER
+ * - PLAYER KEEP MOVING WHEN HITTING WALL
+ */
+
 import Phaser from 'phaser'
 import { useRouter } from 'vue-router'
 import { EditorView, basicSetup } from 'codemirror';
@@ -147,7 +164,7 @@ export default {
             
             player_stats = 'idle'
         }
-        function update() {
+        function update() {            
             if (player_stats === 'attack') player.play('attack', true)
             if (player_stats != 'die') {
                 if (player_stats === 'idle'
