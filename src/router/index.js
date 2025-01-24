@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
 import MainMenu from "@/components/MainMenu.vue"
 import LevelsPage from "@/components/LevelsPage.vue"
-import Level1 from "@/components/levels/Level1.vue"
-import Level2 from "@/components/levels/Level2.vue"
-import Level3 from "@/components/levels/Level3.vue"
+import Level1 from "@/components/levels/level1.vue"
+import Level2 from "@/components/levels/level2.vue"
+import Level3 from "@/components/levels/level3.vue"
 
 const routes = [
     { path: "/", name: "MainMenu", component: MainMenu },

@@ -5,50 +5,81 @@
         </div>
         <div class="w-full h-full m-5 space-y-1" >
             <div id="editor" class="h-[70%] bg-[url('/assets/code_bg.webp')] rounded rounded-xl border border-white p-5 relative" >
-                <button class="absolute bg-[url('/assets/instructions_bg.jpg')] text-white bottom-0 left-0 right-0 p-2 rounded rounded-xl m-3" @click="runCode" >RUN</button>
+                <button class="absolute bg-[url('/assets/instructions_bg.jpg')] text-white bottom-0 left-0 right-0 p-2 rounded rounded-xl m-3" @click="runCode()" >RUN</button>
             </div>
-            <div id="instruction" class="h-[24%] text-white bg-[url('/assets/instructions_bg.jpg')] rounded rounded-xl border border-white p-5" >
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus quia, nulla! Maiores et perferendis eaque, exercitationem praesentium nihil.
+            <div id="instruction" class="h-[24%] bg-[url('/assets/instructions_bg.jpg')] rounded rounded-xl border border-white p-5 relative" >
+                <div v-for="(card, index) in cards"
+                    :key="index"
+                    v-show="showCardIndex === index"
+                >
+                    <p class="text-white" >{{ card }}</p>
+                </div>
+                <div class="absolute bottom-0 w-full">
+                    <button @click="prevCard" :disabled="showCardIndex === 0" class="p-2 rounded rounded-xl bg-white w-1/4 m-2" >
+                        Back
+                    </button>
+                    <button @click="nextCard" :disabled="showCardIndex === cards.length - 1" class="p-2 rounded rounded-xl bg-white w-1/4 m-2" >
+                        Next
+                    </button>
+                </div>
             </div>
-        </div>
+        </div> 
     </div>
 </template>
 
 <script>
 /*
  * TODO:
- * - MULTIPLE COMMAND SUPPORT
- * - COIN ANIMATION and EARN COINS
- * - CHEST ATTACK ANIMATION
- * - GOING DOWN LADDER
- * - MOBILE SUPPORT <?>
- * - POP UP FOR: GOING NEXT LEVEL, PUTTING WRONG COMMAND
- * - HINTS AND TASKS
- * - SCOREBOARD and TUTORIAL VIDEO (after completing each level)
- * - MAIN MENU UI / UX
+ * 1.1 MULTIPLE COMMAND SUPPORT
+ * 1.2 MAIN MENU UI / UX
+ * 2.1 GOING DOWN LADDER
+ * 2.2 POP UP FOR: GOING NEXT LEVEL, PUTTING WRONG COMMAND
+ * 2.3 HINTS AND TASKS
+ * 3.0 CHEST ATTACK ANIMATION
+ * 4.0 COIN ANIMATION and EARN COINS
+ * 5.0 SCOREBOARD and TUTORIAL VIDEO (after completing each level)
+ * 6.0 MOBILE SUPPORT <?>
  * 
  * BUGS: 
  * - PLAYER KEEP JUMPING WHEN CLIMBING LADDER
  * - PLAYER KEEP MOVING WHEN HITTING WALL
+ * - PLAYER TURNING LEFT
  */
 
 import Phaser from 'phaser'
 import { useRouter } from 'vue-router'
 import { EditorView, basicSetup } from 'codemirror';
 import { python } from '@codemirror/lang-python';
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 
 export default {
     name: 'level2',
     setup() {
+        // Setup Cards
+        let showCardIndex = ref(0)
+        const cards = ref([
+            "Today, you will learn how to use a code editor in Python.",
+            "Python is a widely used programming language for Web Development, Software Development, Data Science, Machine Learning, Automation",
+            "First and the most important step is to initialize the character. To begin, type:\n`var hero`.",
+            "Once successful, you should see the character of your player. To make it move, type:\n`hero.moveRight(1)`.",
+            "To attack the chest, type:\n`hero.attack()`.\nNow you know the basics to move and make the hero attack. Move the character to the chest and attack it.",
+            "Enjoy your first mission!",
+        ])
+
+        const prevCard = () => {
+            if (showCardIndex.value > 0) showCardIndex.value--
+        }
+        
+        const nextCard = () => {
+            if (showCardIndex.value < cards.value.length - 1) showCardIndex.value++
+        }
+
         // Setup ROUTER-DOM
         const router = useRouter()
         
         const back = () => {
             router.push('/levels')
         }
-
-        // console.log("hero.moveRight(5)")
 
         // Setup Phaser
         const config = {
@@ -62,7 +93,7 @@ export default {
                 default: 'arcade',
                 arcade: {
                     gravity: { y: 800 },
-                    debug: true,
+                    debug: false,
                 },
             },
             scene: {
@@ -82,7 +113,8 @@ export default {
         let curr_posX = 0
         let curr_posY = 0
         let numMove = 0
-
+        let execute = false
+        
         function preload() {
             this.load.atlas('knight', '/assets/knight.png', '/assets/knight.json')
             this.load.image('bg', '/assets/clouds.png')
@@ -203,7 +235,6 @@ export default {
                     if (player_stats === 'run_left') {
                         player.body.setAllowGravity(true)
 
-                        console.log(curr_posX, player.x)
                         if (curr_posX === 0) curr_posX = player.x
                         
                         if ((curr_posX - player.x) <= 60) {
@@ -225,7 +256,6 @@ export default {
                             player.body.setAllowGravity(false)
 
                             // LADDER JUMP Animation
-                            console.log(curr_posY, player.y)
                             if (curr_posY === 0) curr_posY = player.y
                     
                             if ((curr_posY - player.y) <= 50) {
@@ -250,11 +280,16 @@ export default {
                             }
                         }
                     }
+                } 
+                else if (numMove === 0 && execute) {
+                    console.log(view.state.doc.text)
+                    runCommand(view.state.doc.text)
                 }
             }
 
             // DIE Animation
             if (this.physics.overlap(player, trap_platforms) && player.anims.getName() !== 'die') {
+                execute = false
                 player_stats = 'die'
                 player.play('die', true)
                 this.time.delayedCall(3000, () => {
@@ -263,7 +298,17 @@ export default {
             }
         }
 
-        // CODEMIRROR
+        function runCommand(commands) {
+            const filteredCommands = commands.filter(e => e)
+            // Remove first element from commands
+            if (filteredCommands.length > 1) {
+                // console.log('hello')
+                commands.shift()
+                runCode()
+            }
+        }
+
+        // Setup CODEMIRROR
         // Use the onMounted hook to ensure that DOM is fully rendered before initialising the Codemirror components
         let view
         onMounted(() => {
@@ -278,38 +323,38 @@ export default {
             })
         })
 
+
         function runCode() {
-            for (const command of view.state.doc.text) {
-                if (command) {
-                    if (/^hero.attack\(\)$/.test(command)) {
-                        player_stats = 'attack'
-                    } else if (command.match(/.*\((\d+)\)$/)) {
-                        const match = command.match(/.*\((\d+)\)$/) // regex for capture the number of repetition
-                        numMove = parseInt(match[1], 10)
-                        
-                        if (/^hero.moveRight\(\d+\)$/.test(command)) {
-                            player_stats = 'run_right'
-                        }
-                        else if (/^hero.moveUp\(\d+\)$/.test(command)) {
-                            player_stats = 'jump'
-                        }
-                        else if (/^hero.moveLeft\(\d+\)$/.test(command)) {
-                            player_stats = 'run_left'
-                        }
-                        else {
-                            player_stats = 'idle'
-                            console.log('no match string')
-                        }
-                    } else {
+            execute = true
+            let executeCommand = view.state.doc.text[0]
+            if (executeCommand) {
+                if (/^hero.attack\(\)$/.test(executeCommand)) {
+                    player_stats = 'attack'
+                } else if (executeCommand.match(/.*\((\d+)\)$/)) {
+                    const match = executeCommand.match(/.*\((\d+)\)$/) // regex for capture the number of repetition
+                    numMove = parseInt(match[1], 10)
+                    
+                    if (/^hero.moveRight\(\d+\)$/.test(executeCommand)) {
+                        player_stats = 'run_right'
+                    }
+                    else if (/^hero.moveUp\(\d+\)$/.test(executeCommand)) {
+                        player_stats = 'jump'
+                    }
+                    else if (/^hero.moveLeft\(\d+\)$/.test(executeCommand)) {
+                        player_stats = 'run_left'
+                    }
+                    else {
+                        player_stats = 'idle'
                         console.log('no match string')
                     }
-
+                } else {
+                    console.log('no match string')
                 }
-            }
 
+            }
         }
 
-        return { back, runCode }
+        return { showCardIndex, cards, back, runCode, prevCard, nextCard }
     }
 }
 </script>
