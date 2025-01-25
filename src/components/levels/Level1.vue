@@ -28,6 +28,22 @@
 </template>
 
 <script>
+/*
+ * TODO:
+ * 2.1 GOING DOWN LADDER
+ * 2.2 POP UP FOR: GOING NEXT LEVEL, PUTTING WRONG COMMAND
+ * 3.0 CHEST ATTACK ANIMATION
+ * 4.0 COIN ANIMATION and EARN COINS
+ * 5.0 SCOREBOARD and TUTORIAL VIDEO (after completing each level)
+ * 6.0 MOBILE SUPPORT <?>
+ * 
+ * BUGS: 
+ * - PLAYER KEEP JUMPING WHEN CLIMBING LADDER
+ * - PLAYER KEEP MOVING WHEN HITTING WALL
+ * - PLAYER TURNING LEFT
+ * - REPETITIVE CODE (All levels has the same logic, with different maps)
+ */
+
 import Phaser from 'phaser'
 import { useRouter } from 'vue-router'
 import { EditorView, basicSetup } from 'codemirror';
