@@ -79,7 +79,7 @@ export default {
                 default: 'arcade',
                 arcade: {
                     gravity: { y: 800 },
-                    debug: false,
+                    debug: true,
                 },
             },
             scene: {
@@ -99,7 +99,8 @@ export default {
         let curr_posX = 0
         let curr_posY = 0
         let numMove = 0
-        let execute = false
+
+        let filteredCommands = []
         
         function preload() {
             this.load.atlas('knight', '/assets/knight.png', '/assets/knight.json')
@@ -176,7 +177,6 @@ export default {
                 if (player_stats === 'idle'
                     || player_stats === 'idle_right'
                     || player_stats === 'idle_left'
-                    // || player_stats === 'idle_jump_ladder'
                     || player_stats === 'idle_jump'
                 ) player.play('idle', true)
                 
@@ -255,28 +255,19 @@ export default {
                         }
                     }
                 } 
-                else if (numMove === 0 && execute) {
-                    runCommand(view.state.doc.text)
+                else if (numMove === 0 && filteredCommands.length > 0) {
+                    runCode()
                 }
+
             }
 
             // DIE Animation
             if (this.physics.overlap(player, trap_platforms) && player.anims.getName() !== 'die') {
-                execute = false
                 player_stats = 'die'
                 player.play('die', true)
                 this.time.delayedCall(3000, () => {
                     this.scene.restart();
                 });
-            }
-        }
-
-        function runCommand(commands) {
-            const filteredCommands = commands.filter(e => e)
-            // Remove first element from commands
-            if (filteredCommands.length > 1) {
-                commands.shift()
-                runCode()
             }
         }
 
@@ -297,9 +288,18 @@ export default {
 
 
         function runCode() {
-            execute = true
-            let executeCommand = view.state.doc.text[0]
-            if (executeCommand) {
+            // When run code button is pressed, this function will run
+            // 1. it will first filter the commands from empty string
+            // 2. it will take the first command
+            // 3. check if command exist and valid => if yes, it will remove that command from the filteredCommandsArray
+            // 4. it will then find the right animation to run
+
+            if (filteredCommands.length === 0) filteredCommands = (view.state.doc.text).filter(e => e)
+            let executeCommand = filteredCommands[0]
+            
+            if (executeCommand && filteredCommands.length > 0) {
+                filteredCommands.shift()
+
                 if (/^hero.attack\(\)$/.test(executeCommand)) {
                     player_stats = 'attack'
                 } else if (executeCommand.match(/.*\((\d+)\)$/)) {
