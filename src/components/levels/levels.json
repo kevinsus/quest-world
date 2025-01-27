@@ -1,0 +1,150 @@
+{
+    "levelConfig": {
+        "level1": {
+            "chatlogs": [
+                "Today, you will learn how to use a code editor in Python.",
+                "Python is a widely used programming language for Web Development, Software Development, Data Science, Machine Learning, Automation",
+                "First and the most important step is to initialize the character. To begin, type: `var hero`.",
+                "Once successful, you should see the character of your player. To make it move, type: `hero.moveRight(1)`.",
+                "To attack the chest, type:`hero.attack()`. Now you know the basics to move and make the hero attack. Move the character to the chest and attack it.",
+                "Enjoy your first mission!"
+            ],
+            "maps": {
+                "platforms": [
+                    {
+                        "pos_i_start": 0,
+                        "pos_i_end": 16,
+                        "poss_block": 670,
+                        "pos_sprite": 0
+                    },
+                    {
+                        "pos_i_start": 15,
+                        "pos_i_end": 16,
+                        "poss_block": 610,
+                        "pos_sprite": 57
+                    }
+                ],
+                "pass_platforms": [
+                    {
+                        "pos_i_start": 7,
+                        "pos_i_end": 8,
+                        "poss_block": 610,
+                        "pos_sprite": 42
+                    }
+                ]
+            }
+        },
+        "level2": {
+            "chatlogs": [
+                "Now that you have undertood how to use variables, lets dive into a more interesting topic, the while loops",
+                "A while loop in python is a sets aside a block of code that is to be executed repeatedly until a condition is falsified",
+                "In other words, the code you write inside the while loop will keep running unless the condition you state for the loop failed",
+                "There are 2 ways to initialize a loop inside python",
+                "1. while (condition) { run code }\n and 2. for (initialization; test-condition; increment or dicrement) { run code }",
+                "Let's try using this loop. The aim is to use while loop to move the player to the end of the map",
+                "If we were to solve this level, it would be by: hero.moveRight(2); hero.moveUp(2); 3 times, hence try to solve it using the while loop",
+                "Answer: for (let i = 0; i < 3; i++) { hero.moveRight(2); hero.moveUp(2) }"
+            ],
+            "maps": {
+                "ladder_platforms": [
+                    {
+                        "pos_i_start": 0,
+                        "pos_i_end": 5,
+                        "pos_block_i": 3,
+                        "poss_block": 350,
+                        "pos_sprite": 56
+                    },
+                    {
+                        "pos_i_start": 0,
+                        "pos_i_end": 4,
+                        "pos_block_i": 11,
+                        "poss_block": 255,
+                        "pos_sprite": 56
+                    },
+                    {
+                        "pos_i_start": 0,
+                        "pos_i_end": 3,
+                        "pos_block_i": 7,
+                        "poss_block": 480,
+                        "pos_sprite": 56
+                    }
+                ],
+                "trap_platforms": [
+                    {
+                        "pos_i_start": 4,
+                        "pos_i_end": 7,
+                        "poss_block": 670,
+                        "pos_sprite": 35
+                    },
+                    {
+                        "pos_i_start": 8,
+                        "pos_i_end": 10,
+                        "poss_block": 670,
+                        "pos_sprite": 35
+                    }
+                ],
+                "platforms": [
+                    {
+                        "pos_i_start": 4,
+                        "pos_i_end": 7,
+                        "poss_block": 360,
+                        "pos_sprite": 28
+                    },
+                    {
+                        "pos_i_start": 8,
+                        "pos_i_end": 12,
+                        "poss_block": 510,
+                        "pos_sprite": 28
+                    },
+                    {
+                        "pos_i_start": 9,
+                        "pos_i_end": 11,
+                        "poss_block": 265,
+                        "pos_sprite": 28
+                    },
+                    {
+                        "pos_i_start": 0,
+                        "pos_i_end": 4,
+                        "poss_block": 670,
+                        "pos_sprite": 0
+                    },
+                    {
+                        "pos_i_start": 7,
+                        "pos_i_end": 8,
+                        "poss_block": 670,
+                        "pos_sprite": 0
+                    },
+                    {
+                        "pos_i_start": 10,
+                        "pos_i_end": 17,
+                        "poss_block": 670,
+                        "pos_sprite": 0
+                    },
+                    {
+                        "pos_i_start": 15,
+                        "pos_i_end": 16,
+                        "poss_block": 610,
+                        "pos_sprite": 57
+                    }
+                ],
+                "pass_platforms": [
+                    {
+                        "pos_i_start": 7,
+                        "pos_i_end": 8,
+                        "poss_block": 610,
+                        "pos_sprite": 42
+                    },
+                    {
+                        "pos_i_start": 9,
+                        "pos_i_end": 10,
+                        "poss_block": 190,
+                        "pos_sprite": 42
+                    }
+                ]
+            }
+        },
+        "level3": {
+
+        }
+    }
+}

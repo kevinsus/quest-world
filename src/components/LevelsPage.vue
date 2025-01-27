@@ -13,19 +13,19 @@ const levels = [
         name: "Level 1: Python Variables",
         description: "We will be introducing what variable is in python and how to use them",
         image: "/assets/levels/level1.png",
-        path: "level-1"
+        path: "level1"
     },
     {
         name: "Level 2: Python While-Loop",
         description: "We will be introducing what variable is in python and how to use them",
         image: "/assets/levels/level2.png",
-        path: "level-2"
+        path: "level2"
     },
     {
         name: "Level 3: Bonus Level",
         description: "We will be introducing what variable is in python and how to use them",
         image: "/assets/levels/level2.png",
-        path: "level-3"
+        path: "level3"
     },
 ]
 </script>

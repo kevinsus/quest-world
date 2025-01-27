@@ -45,35 +45,29 @@
  */
 
 import Phaser from 'phaser'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { EditorView, basicSetup } from 'codemirror';
 import { python } from '@codemirror/lang-python';
 import { onMounted, ref } from 'vue';
+import { levelConfig } from '@/components/levels/levels.json'
 
 export default {
-    name: 'level1',
+    name: 'level',
     setup() {
+        // Get level number
+        const levelPath = (useRoute().fullPath.match(/^\/levels\/level(\d+)$/))
+        const numLevel = parseInt(levelPath[1], 10)
+
         // Setup Cards
         let showCardIndex = ref(0)
-        const cards = ref([
-            "Today, you will learn how to use a code editor in Python.",
-            "Python is a widely used programming language for Web Development, Software Development, Data Science, Machine Learning, Automation",
-            "First and the most important step is to initialize the character. To begin, type:\n`var hero`.",
-            "Once successful, you should see the character of your player. To make it move, type:\n`hero.moveRight(1)`.",
-            "To attack the chest, type:\n`hero.attack()`.\nNow you know the basics to move and make the hero attack. Move the character to the chest and attack it.",
-            "Enjoy your first mission!",
-        ])
+        const cards = ref(levelConfig[`level${numLevel}`].chatlogs)
 
         const prevCard = () => {
-            console.log(showCardIndex.value)
             if (showCardIndex.value > 0) showCardIndex.value--
-            console.log(showCardIndex.value)
         }
         
         const nextCard = () => {
-            console.log(showCardIndex.value)
             if (showCardIndex.value < cards.value.length - 1) showCardIndex.value++
-            console.log(showCardIndex.value)
         }
 
         // Setup ROUTER-DOM
@@ -133,9 +127,33 @@ export default {
             ladder_platforms = this.physics.add.staticGroup()
 
             // ADDING BLOCKS
-            for (let i = 0; i < 16; i++) platforms.create(64 * i, 670, 'tiles', 0) // ground
-            for (let i = 7; i < 8; i++) pass_platforms.create(64 * i, 610, 'tiles', 42) // coins
-            for (let i = 15; i < 16; i++) platforms.create(64 * i, 610, 'tiles', 57) // chest
+            const maps = levelConfig[`level${numLevel}`].maps
+            const ladder_platform_blocks = maps.ladder_platforms
+            const trap_platforms_blocks = maps.trap_platforms
+            const platform_blocks = maps.platforms
+            const pass_platform_blocks = maps.pass_platforms
+
+            if (ladder_platform_blocks) {
+                for (const block of ladder_platform_blocks) {
+                    for (let i = block.pos_i_start; i < block.pos_i_end; i++) platforms.create(64 * block.pos_block_i, block.poss_block + i * 64, 'tiles', block.pos_sprite)  
+                }
+            }
+            if (trap_platforms_blocks) {
+                for (const block of trap_platforms_blocks) {
+                    for (let i = block.pos_i_start; i < block.pos_i_end; i++) platforms.create(64 * i, block.poss_block, 'tiles', block.pos_sprite)   
+                }
+            }
+            if (platform_blocks) {
+                for (const block of platform_blocks) {
+                    for (let i = block.pos_i_start; i < block.pos_i_end; i++) platforms.create(64 * i, block.poss_block, 'tiles', block.pos_sprite)   
+                }
+            }
+            if (pass_platform_blocks) {
+                for (const block of pass_platform_blocks) {
+                    for (let i = block.pos_i_start; i < block.pos_i_end; i++) platforms.create(64 * i, block.poss_block, 'tiles', block.pos_sprite)   
+                }
+            }
+            
 
             // PLAYER ANIMATIONS
             this.anims.create({
@@ -187,7 +205,7 @@ export default {
             
             player_stats = 'idle'
         }
-        function update() {            
+        function update() {   
             if (player_stats === 'attack') player.play('attack', true)
             if (player_stats != 'die') {
                 if (player_stats === 'idle'
