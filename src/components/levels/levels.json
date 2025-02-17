@@ -4,9 +4,32 @@
             "chatlogs": [
                 "Today, you will learn how to use a code editor in Python.",
                 "Python is a widely used programming language for Web Development, Software Development, Data Science, Machine Learning, Automation",
-                "First and the most important step is to initialize the character. To begin, type: `var hero`.",
-                "Once successful, you should see the character of your player. To make it move, type: `hero.moveRight(1)`.",
-                "To attack the chest, type:`hero.attack()`. Now you know the basics to move and make the hero attack. Move the character to the chest and attack it.",
+                "Before we begin your journey, let's prepare all the tools we need. In python, we use libraries",
+                "libraries is a collections of code that has been written by someone else to help us do things easier",
+                "Let's try demo this! First, lets import the library hero by typing 'import Hero'",
+                "Great! Now let's talk about variables. Thunk of a variable as a container that holds information.",
+                "To create your hero, lets use a variable. To initialize a variable, type 'hero = Hero",
+                "This code means that you will store the all the Hero information from the import to the variable hero",
+                "Now that you've known how to use variables, go proceed to the next level!"
+            ],
+            "maps": {
+                "platforms": [
+                    {
+                        "pos_i_start": 0,
+                        "pos_i_end": 16,
+                        "poss_block": 670,
+                        "pos_sprite": 0
+                    }
+                ]
+            },
+            "playerLoc": [500, 450]
+        },
+        "level2": {
+            "chatlogs": [
+                "Now, your hero variable contains all the abilities that you can call to use the animation",
+                "Here are some of the basic abilities which you can call: hero.moveRight(), hero.moveLeft, hero.moveUp(), hero.attack()",
+                "Note that all these abilities requires number, which indicate how many times you want it to move, except hero.attack()",
+                "Now you know the basics to move and make the hero attack. Move the character to the chest and attack it.",
                 "Enjoy your first mission!"
             ],
             "maps": {
@@ -32,9 +55,10 @@
                         "pos_sprite": 42
                     }
                 ]
-            }
+            },
+            "playerLoc": [93, 450]
         },
-        "level2": {
+        "level3": {
             "chatlogs": [
                 "Now that you have undertood how to use variables, lets dive into a more interesting topic, the while loops",
                 "A while loop in python is a sets aside a block of code that is to be executed repeatedly until a condition is falsified",
@@ -141,10 +165,8 @@
                         "pos_sprite": 42
                     }
                 ]
-            }
-        },
-        "level3": {
-
+            },
+            "playerLoc": [93, 450]
         }
     }
 }

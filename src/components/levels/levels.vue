@@ -31,9 +31,9 @@
 /*
  * TODO:
  * 2.1 GOING DOWN LADDER
- * 2.2 POP UP FOR: GOING NEXT LEVEL, PUTTING WRONG COMMAND
+ * 2.2 POP UP FOR: WINNING GAME, GOING NEXT LEVEL, PUTTING WRONG COMMAND
  * 3.0 CHEST ATTACK ANIMATION
- * 4.0 COIN ANIMATION and EARN COINS
+ * 4.0 COIN ANIMATION and EARN COINS (POINTS)
  * 5.0 SCOREBOARD and TUTORIAL VIDEO (after completing each level)
  * 6.0 MOBILE SUPPORT <?>
  * 
@@ -41,7 +41,6 @@
  * - PLAYER KEEP JUMPING WHEN CLIMBING LADDER
  * - PLAYER KEEP MOVING WHEN HITTING WALL
  * - PLAYER TURNING LEFT
- * - REPETITIVE CODE (All levels has the same logic, with different maps)
  */
 
 import Phaser from 'phaser'
@@ -194,7 +193,8 @@ export default {
             })
 
             // PLAYER SETUP
-            player = this.physics.add.sprite(93, 450, 'knight')
+            const playerLoc = levelConfig[`level${numLevel}`].playerLoc
+            player = this.physics.add.sprite(playerLoc[0], playerLoc[1], 'knight')
             player.setScale(3)
             player.setSize(player.width * 0.25, player.height * 0.8)
             player.setOffset(player.width * 0.25, player.height * 0.2)
